@@ -6,6 +6,7 @@ import 'package:apex_altimeter/constants.dart';
 import 'package:apex_altimeter/frontpage.dart';
 import 'package:apex_altimeter/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,8 +36,6 @@ class MyHomePageState extends State<MyHomePage> {
   bool dark = false;
   String units = 'metric';
 
-
-
   void refreshUnits(String unitsC) {
     setState(() {
       units = unitsC;
@@ -51,7 +50,9 @@ class MyHomePageState extends State<MyHomePage> {
 
   Future<bool> getTheme({bool isInBuilder = false}) async {
     return Constants.prefs.then((SharedPreferences preferences) {
-      var dt = preferences.getBool('theme') != null ? preferences.getBool('theme') : true;
+      var dt = preferences.getBool('theme') != null
+          ? preferences.getBool('theme')
+          : true;
       if (!isInBuilder) {
         setState(() {
           dark = dt;
@@ -63,7 +64,9 @@ class MyHomePageState extends State<MyHomePage> {
 
   Future<String> getUnits({bool isInBuilder = false}) async {
     return Constants.prefs.then((SharedPreferences prefrences) {
-      var un = prefrences.getString('units') != null ? prefrences.get('units') : 'metric';
+      var un = prefrences.getString('units') != null
+          ? prefrences.get('units')
+          : 'metric';
       if (!isInBuilder) {
         setState(() {
           units = un;
@@ -72,8 +75,6 @@ class MyHomePageState extends State<MyHomePage> {
       return un;
     });
   }
-
-
 
   int _selectedIndex = 0;
 
@@ -122,36 +123,67 @@ class MyHomePageState extends State<MyHomePage> {
         debugShowCheckedModeBanner: false,
         theme: dark ? Constants.darkTheme : Constants.lightTheme,
         home: Scaffold(
-          body: FutureBuilder<List>(
-            future: Future.wait([
-              getTheme(isInBuilder: true),
-              getUnits(isInBuilder: true)
-            ]),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return _tabs[_selectedIndex];
-              }
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            },
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            onTap: onTapOpened,
-            currentIndex: _selectedIndex,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(FontAwesomeIcons.route),
-                title: Text(''),
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(FontAwesomeIcons.cog),
-                title: Text(''),
-              )
-            ],
-          ),
-        ));
+            body: CustomScrollView(
+              physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              slivers: <Widget>[
+                SliverAppBar(
+                  stretch: true,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomRight: Radius.circular(30), bottomLeft: Radius.circular(30))),
+                  onStretchTrigger: () {
+                    // Function callback for stretch
+                    return Future.value();
+                  },
+                  pinned: true,
+                  expandedHeight: Constants.size.height * 0.5,
+                  flexibleSpace: FlexibleSpaceBar(
+                    stretchModes: <StretchMode>[
+                      StretchMode.zoomBackground,
+                    ],
+                    centerTitle: true,
+                    title: const Text('Apex Altimeter'),
+                    background: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(image: AssetImage(backgroundPic), fit: BoxFit.cover),
+                          borderRadius: BorderRadius.only(bottomRight: Radius.circular(30), bottomLeft: Radius.circular(30))
+                      ),
+                    )
+                  ),
+                ),
+                SliverFillRemaining(child: FutureBuilder<List>(
+                  future: Future.wait([
+                    getTheme(isInBuilder: true),
+                    getUnits(isInBuilder: true)
+                  ]),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return _tabs[_selectedIndex];
+                    }
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  },
+                ),)
+
+              ],
+            ),
+            bottomNavigationBar: BottomNavigationBar(
+              onTap: onTapOpened,
+              currentIndex: _selectedIndex,
+              showSelectedLabels: false,
+              showUnselectedLabels: false,
+              items: [
+                BottomNavigationBarItem(
+                  icon: Icon(FontAwesomeIcons.route),
+                  label: '',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(FontAwesomeIcons.cog),
+                  label: '',
+                )
+              ],
+            )
+        )
+    );
   }
 }

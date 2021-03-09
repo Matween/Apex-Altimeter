@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Constants {
 
+  static Size size = Size.fromHeight(300);
+
   static ThemeData lightTheme = ThemeData(
     visualDensity: VisualDensity.adaptivePlatformDensity,
     primaryColor: Color.fromRGBO(0, 212, 170, 1),

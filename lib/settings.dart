@@ -21,7 +21,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Function notifyParentUnits;
   Function notifyParentTheme;
-  String radioValueUnits = 'metric';
+  String radioValueUnits;
   bool darkTheme = false;
 
   void _handleRadioValueUnitsChange(String units) {
@@ -53,7 +53,6 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-          appBar: AppBar(title: Text('Settings'),),
           body: Container(
             child: Column(
               children: <Widget>[
